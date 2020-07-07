@@ -1,17 +1,17 @@
 <?php
 
 use app\common\facade\CampaignFacade;
-use app\common\facade\ProgramFacade;
-use app\common\facade\ProgramRatingFacade;
+use app\common\facade\DeptFacade;
+use app\common\facade\DeptRatingFacade;
 use app\common\model\Campaign;
-use app\common\model\Program;
-use app\common\model\ProgramRating;
+use app\common\model\Department;
+use app\common\model\DeptRating;
 
 return [
     'facade' => [
         CampaignFacade::class => Campaign::class,
-        ProgramFacade::class => Program::class,
-        ProgramRatingFacade::class => ProgramRating::class,
+        DeptFacade::class => Department::class,
+        DeptRatingFacade::class => DeptRating::class,
     ],
     'alias' => [
 

@@ -9,7 +9,7 @@ use app\common\validate\BaseValidate;
 class CampaignValidate extends BaseValidate
 {
     public $rule = [
-        'campaignUID' => 'require|length:32'
+        'campaignID' => 'require|isPositiveInteger'
     ];
 
     public $message = [
@@ -18,7 +18,6 @@ class CampaignValidate extends BaseValidate
 
     public function sceneUpdate()
     {
-        $this->append('desc', 'require|isNotEmpty');
         $this->append('date', 'require|isNotEmpty');
         $this->append('start_time', 'require|isNotEmpty');
         $this->append('end_time', 'require|isNotEmpty');

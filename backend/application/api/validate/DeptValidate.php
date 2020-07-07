@@ -6,20 +6,28 @@ namespace app\api\validate;
 
 use app\common\validate\BaseValidate;
 
-class ProgramValidate extends BaseValidate
+class DeptValidate extends BaseValidate
 {
     public $rule = [
-        'programUID' => 'require|length:32'
+        'deptID' => 'require|isPositiveInteger'
     ];
 
     public $message = [
-        'programUID' => '非法项目ID'
+        'deptID' => '非法部门ID'
     ];
 
     public function sceneScore()
     {
-        return $this->append('score', 'require|number|min:1|max:10');
+        $this->append('campaignID', 'require|isPositiveInteger');
+        $this->append('ruleID', 'require|isPositiveInteger');
+        return $this->append('score', 'require|number|min:1|max:100');
     }
+
+    public function sceneRule()
+    {
+        return $this->append('campaignID', 'require|isPositiveInteger');
+    }
+
 
 
 }

@@ -7,7 +7,6 @@ return [
     'callbackState'         =>  'reviewer@aukey',
     'access_token_expire'   =>  7200,
     'access_token_cache'    =>  "wx_access_token",
-    'contact_info'          =>  "欢迎使用测评平台！我们将尽快处理您的申请并通过企业微信通知您。如有任何疑问，请联系万伟斌或王超。",
     /*--------------api 接口-------------------*/
     // 获取access_token get
     'ACCESS_TOKEN_API'      => 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s',

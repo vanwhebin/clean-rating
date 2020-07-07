@@ -4,110 +4,69 @@
 namespace app\api\controller\v1;
 
 use app\api\validate\CampaignValidate;
-use app\api\validate\CreateCampaignValidate;
 use app\common\controller\BaseController;
 use app\common\exception\InvalidParamException;
-use app\common\facade\ProgramFacade as ProgramModel;
-use app\common\facade\CampaignFacade as CampaignModel;
-use app\common\facade\ProgramRatingFacade as ProgramRatingModel;
-use app\common\validate\PaginationValidate;
-use think\facade\Hook;
+use app\common\model\Campaign as CampaignModel;
+use app\common\model\CampaignRating;
+use app\common\model\CampaignRatingResult;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\Request;
 use think\response\Json;
 
 class Campaign extends BaseController
 {
-    /**
-     * 获取活动列表信息
-     * @param Request $request
-     * @return Json
-     * @throws InvalidParamException
-     */
-    public function collections(Request $request)
-    {
-        (new PaginationValidate())->validate();
-        $data = $request->param();
-        $campaigns = CampaignModel::getList($data['pageSize'], $data['pageNum'])->toArray();
-        return resJson($campaigns);
-    }
-
 
     /**
-     * 当前活动的细节
+     *  当前活动的细节
      * @param Request $request
      * @return Json
+     * @throws DataNotFoundException
+     * @throws DbException
      * @throws InvalidParamException
+     * @throws ModelNotFoundException
      */
     public function index(Request $request)
     {
         (new CampaignValidate())->validate();
-        $campaignUID = $request->param('campaignUID', 0);
-        $campaign = CampaignModel::findByUid($campaignUID);
+        $campaignID = $request->param('campaignID', 0);
+        $campaign = CampaignModel::findByUid($campaignID);
         return resJson($campaign);
     }
 
-    /**
-     * 用戶全部完成提交,不再修改
-     * @param Request $request
-     * @return Json
-     * @throws InvalidParamException
-     */
-    public function batchSubmit(Request $request)
-    {
-        // 检查当前用户需要评分的项目记录，是否都已经有了评分，如果没有，则进行反馈
-        // 为真 直接返回
-        (new CampaignValidate())->validate();
-        $data = $request->param();
-        $user = $request->user;
-        $campaign = CampaignModel::findByUid($data['campaignUID']);
-        ProgramRatingModel::disableStatus($campaign, $user);
-        $allDone = ProgramRatingModel::checkRecord($campaign->id);
-        if (!$allDone) {
-            Hook::exec('app\\api\\behavior\\GetCampaignRatingBehavior', $campaign->toArray());
-        }
-        return resJson();
-    }
 
     /**
-     * 获取排行结果
+     * 更新活动信息
      * @param Request $request
      * @return Json
+     * @throws DataNotFoundException
+     * @throws DbException
      * @throws InvalidParamException
+     * @throws ModelNotFoundException
      */
-    public function top(Request $request)
+    public function update(Request $request)
     {
-        (new CampaignValidate())->validate();
+        (new CampaignValidate())->scene('update')->validate();
         $data = $request->param();
-        $campaign = CampaignModel::findByUid($data['campaignUID']);
-        $checkRating = ProgramModel::checkRating();
-        if ($checkRating) {
-            $programRanking = [];
+        $campaign = CampaignModel::findByUid($data['campaignID']);
+        if ($campaign->updateInfo($campaign, $data)) {
+            return resJson($campaign);
         } else {
-            $programRanking = ProgramModel::getRankedResults($campaign->id)->toArray();
+            logger('更新活动失败', json_encode($request->param()), __CLASS__.'#'.__METHOD__);
+            $code = config('error_code.campaign')['UPDATE_FAIL'];
+            $msg = config('error_msg');
+            return resJson($request->param(), $msg[$code], $code);
         }
-        return resJson($programRanking);
     }
-
-    /**
-     * 获取评分人员
-     * @param Request $request
-     * @return Json
-     * @throws InvalidParamException
-     */
-    public function rater(Request $request)
-    {
-        (new CampaignValidate())->validate();
-        $data = $request->param();
-        $campaign = CampaignModel::findByUid($data['campaignUID']);
-        $raters = $campaign->getRaters($campaign->rule, $campaign->id);
-        return resJson($raters);
-    }
-
 
     /**
      * 查找当前最新的的活动信息
      * @param Request $request
      * @return Json
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function latest(Request $request)
     {
@@ -121,89 +80,41 @@ class Campaign extends BaseController
         }
     }
 
+
     /**
-     * 更新评分规则
+     * 获取排名
      * @param Request $request
      * @return Json
      * @throws InvalidParamException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
-    public function rule(Request $request)
+    public function ranking(Request $request)
     {
         (new CampaignValidate())->validate();
         $data = $request->param();
-        $campaign = CampaignModel::findByUid($data['campaignUID']);
-        $campaign->rule = json_encode($data['rule']);
-        if ($campaign->save()) {
-            return resJson();
-        } else {
-            $error = errCodeMsg('campaign', 'UPDATE_RULE_FAIL');
-            return resJson($request->param(), $error['msg'], $error['code']);
-        }
-    }
-
-    /**
-     * 创建活动
-     * @param Request $request
-     * @return Json
-     * @throws InvalidParamException
-     */
-    public function create(Request $request)
-    {
-
-        (new CreateCampaignValidate())->validate();
-        if ($campaign = CampaignModel::createOne($request->param())) {
-            Hook::exec('app\\api\\behavior\\CreateUUIDBehavior', $campaign);
-            return resJson($campaign);
-        } else {
-            logger('创建活动失败', json_encode($request->param()), __CLASS__.'#'.__METHOD__);
-            $code = config('error_code.campaign')['CREATE_FAIL'];
-            $msg = config('error_msg');
-            return resJson($request->param(), $msg[$code], $code);
-        }
-    }
-
-    /**
-     * 更新活动信息
-     * @param Request $request
-     * @return Json
-     * @throws InvalidParamException
-     */
-    public function update(Request $request)
-    {
-        (new CampaignValidate())->scene('update')->validate();
-        $data = $request->param();
-        $campaign = CampaignModel::findByUid($data['campaignUID']);
-        if ($campaign->updateInfo($campaign, $data)) {
-            return resJson($campaign);
-        } else {
-            logger('更新活动失败', json_encode($request->param()), __CLASS__.'#'.__METHOD__);
-            $code = config('error_code.campaign')['UPDATE_FAIL'];
-            $msg = config('error_msg');
-            return resJson($request->param(), $msg[$code], $code);
-        }
+        $ranking = CampaignRating::getRankingResult($data);
+        return resJson($ranking);
     }
 
 
     /**
-     * 刪除活動
+     * 获取已评分的部门
      * @param Request $request
      * @return Json
      * @throws InvalidParamException
      */
-    public function delete(Request $request)
+    public function ratedDept(Request $request)
     {
         (new CampaignValidate())->validate();
-        if (CampaignModel::where(['uuid' => $request->param('campaignUID', 0)])->find()->delete()) {
-            $user = $request->user;
-            logger($user->name.'刪除活动成功', json_encode($request->param()), __CLASS__.'#'.__METHOD__);
-            return resJson();
-        } else {
-            logger('刪除活动失败', json_encode($request->param()), __CLASS__.'#'.__METHOD__);
-            $error = errCodeMsg('campaign', 'DELETE_FAIL');
-            return resJson($request->param(), $error['msg'], $error['code']);
-        }
+        $campaignID = $request->only('campaignID');
+        $user = $request->user;
+        $deptIDs = CampaignRatingResult::getRatedDeptIDs($campaignID, $user['id']);
+        return resJson($deptIDs);
     }
 
 
+    
 
 }

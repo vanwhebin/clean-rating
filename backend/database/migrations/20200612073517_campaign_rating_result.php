@@ -3,7 +3,7 @@
 use think\migration\Migrator;
 use think\migration\db\Column;
 
-class CampaignRatingRule extends Migrator
+class CampaignRatingResult extends Migrator
 {
     /**
      * Change Method.
@@ -28,10 +28,13 @@ class CampaignRatingRule extends Migrator
      */
     public function change()
     {
-        $table = $this->table('campaign_rating_rule',array('engine'=>'MyISAM','charset' => 'utf8mb4'));
-        $table->addColumn('title', 'string', ['limit' => 255, 'null' => false, 'comment' => '规则标题'])
-            ->addColumn('desc', 'string', ['limit' => 255, 'null' => false, 'default'=> '', 'comment' => '具体规则的描述'])
-            ->addColumn('content', 'string', ['limit' => 500, 'null' => false, 'comment' => '执行的规则'])
+        $table = $this->table('campaign_rating_result',array('engine'=>'MyISAM','charset' => 'utf8mb4'));
+        $table->addColumn('dept_id', 'integer', ['limit' => 4, 'null' => false, 'signed' => false, 'comment' => '对应的部门ID'])
+            ->addColumn('campaign_id', 'integer', ['limit' => 3, 'signed' =>false, 'null' => false, 'comment' => 'campaign表ID'])
+            ->addColumn('user_id', 'integer', ['limit' => 3, 'signed' =>false, 'null' => false, 'comment' => 'user表ID'])
+            ->addColumn('rule_id', 'integer', ['limit' => 3, 'signed' =>false, 'null' => false, 'comment' => 'rule表ID'])
+            ->addColumn('score', 'integer', ['limit' => 3, 'signed' =>false, 'null' => false, 'comment' => '评分'])
+            ->addColumn('order', 'integer', ['limit' => 3, 'signed' =>false, 'null' => false, 'default' => 0, 'comment' => '排序'])
             ->addColumn('create_time', 'integer', ['limit' => 11, 'signed' => false,'null'=> true,  'comment' => '创建时间'])
             ->addColumn('update_time', 'integer', ['limit' => 11, 'signed' => false, 'null'=> true, 'comment' => '更新时间'])
             ->addColumn('delete_time', 'integer', ['limit' => 11, 'signed' => false,'null'=> true,  'comment' => '删除时间'])

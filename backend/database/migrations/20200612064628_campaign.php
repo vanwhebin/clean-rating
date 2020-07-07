@@ -30,10 +30,8 @@ class Campaign extends Migrator
     {
         $table = $this->table('campaign',array('engine'=>'InnoDB','charset' => 'utf8mb4'));
         $table->addColumn('title', 'string', ['limit'=> 255, 'default' => '', 'comment' => '活动标题，一般就是时间'])
-            ->addColumn('uuid', 'string', ['limit' => 255, 'default' => '', 'comment' => '唯一标识'])
             ->addColumn('rule', 'string', ['limit' => 500, 'null' => false, 'comment' => '执行的规则'])
             ->addColumn('desc', 'string', ['limit'=> 500, 'default' => '', 'comment' => '描述， 活动规则之类'])
-            ->addColumn('rating_rule_id', 'integer', ['limit'=> 5, 'default' => 1,  'comment' => '执行评分的规则'])
             ->addColumn('create_time', 'integer', ['limit' => 11, 'signed' => false,'null'=> true,  'comment' => '创建时间'])
             ->addColumn('update_time', 'integer', ['limit' => 11, 'signed' => false, 'null'=> true, 'comment' => '更新时间'])
             ->addColumn('delete_time', 'integer', ['limit' => 11, 'signed' => false,'null'=> true,  'comment' => '删除时间'])
