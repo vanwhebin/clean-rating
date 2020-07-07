@@ -4,6 +4,7 @@
         <van-cell-group>
             <img class="user-poster" :src="curObject.img" alt="" :style="{width:'100%','margin-bottom': '20px'}">
         </van-cell-group>
+
         <van-tabs v-model="tabs.active">
             <van-tab :title="key" :key="key" v-for="(item,key) in tabs.data">
                 <van-grid>
@@ -12,6 +13,11 @@
                 </van-grid>
             </van-tab>
         </van-tabs>
+        <div class="block" v-if="submitting">
+            <van-loading :style="{'text-align': 'center','padding-top': '35px'}" size="35px"></van-loading>
+        </div>
+        <div class="submit" v-else><van-button round plain hairline type="info" @click="submitAll">提交评分</van-button></div>
+
         <div class="rater" v-show="selectedRule.weight">
             <van-action-sheet v-model="showPicker" close-on-click-action @cancel="onCancel"
                               :description="selectedRule.desc">
@@ -21,7 +27,6 @@
                 </div>
             </van-action-sheet>
         </div>
-        <div class="submit"><van-button round plain hairline type="info" @click="submitAll">提交评分</van-button></div>
 
     </div>
 </template>
@@ -31,11 +36,12 @@
     import config from '@/config'
     import { getStore } from '@/utils/storage'
 
-    import { Tab, Tabs, NavBar, Toast, Grid, GridItem, Picker, ActionSheet, CellGroup, Button, Notify } from 'vant'
+    import { Tab, Tabs, NavBar, Toast, Grid, GridItem, Picker, ActionSheet, CellGroup, Button, Notify, Loading } from 'vant'
 
     export default {
         name: "Score",
         components: {
+            [Loading.name]: Loading,
             [CellGroup.name]: CellGroup,
             [Button.name]: Button,
             [Notify.Component.name]: Notify.Component,
@@ -60,6 +66,7 @@
                     weight: 0,
                     desc: ''
                 },
+                submitting: false,
                 showPicker: false,
                 tabs: {
                     data: [],
@@ -96,11 +103,15 @@
                 console.log(this.selectedRule)
                 Toast(`当前值：${value}`)
                 this.showPicker = false
+                this.submitting = true
+
                 const campaignID = getStore(config.campaignRef)
                 const data = {campaignID: campaignID, ruleID: _this.selectedRule.rule_id, score: value}
                 postScore(_this.curObject.id, data).then((res) => {
                     console.log(res)
                     if (!res.code) {
+                        setTimeout(function() {_this.submitting = false}, 500)
+
                         Notify({ type: 'success', message: '此项评分成功', duration: 800 })
                         getScoredRule(_this.curObject.id, data).then((r) => {
                             _this.updateFormat(r.data)
@@ -166,5 +177,13 @@
     .submit{
         text-align: center;
         margin-top: 100px;
+    }
+    .block {
+        margin:auto;
+        text-align: center;
+        width: 120px;
+        height: 120px;
+        border-radius: 3px;
+        background-color: #eceaea5c;
     }
 </style>
