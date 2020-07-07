@@ -2,7 +2,7 @@
     <div>
         <van-nav-bar :title="curObject.name" left-text="返回" left-arrow @click-left="onClickLeft"></van-nav-bar>
         <van-cell-group>
-            <img class="user-poster" :src="curObject.img" alt="" :style="{width:'100%','margin-bottom': '20px'}">
+            <img class="user-poster" src="../assets/6s.png" alt="" :style="{width:'100%'}">
         </van-cell-group>
         <van-skeleton title :row="6" :loading="loading" class="skeleton">
             <van-tabs v-model="tabs.active">
@@ -59,7 +59,7 @@
                 curObject: {
                     id: 0,
                     name: '',
-                    img: 'https://img.yzcdn.cn/public_files/2017/10/23/8690bb321356070e0b8c4404d087f8fd.png'
+                    img: '../assets/6s.png'
                 },
                 columns: [],
                 selectedRule: {
