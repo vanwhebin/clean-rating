@@ -1,7 +1,8 @@
 <template>
     <div>
         <img class="user-poster" :src="img" alt="" :style="{width:'100%','margin-bottom': '20px'}">
-        <van-skeleton title :row="17" :loading="loading" class="skeleton">
+        <van-skeleton title :row="17" :loading="loading" class="
+">
             <div>
                 <van-cell-group>
                     <van-cell icon="records" :title="item.name" :key="key" v-for="(item, key) in depts" @click="goRating(item)" is-link :value="item.status?'':'已评分'"></van-cell>

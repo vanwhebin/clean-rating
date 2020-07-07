@@ -4,20 +4,20 @@
         <van-cell-group>
             <img class="user-poster" :src="curObject.img" alt="" :style="{width:'100%','margin-bottom': '20px'}">
         </van-cell-group>
-
-        <van-tabs v-model="tabs.active">
-            <van-tab :title="key" :key="key" v-for="(item,key) in tabs.data">
-                <van-grid>
-                    <van-grid-item :icon="it.icon ? it.icon : 'question-o'" :key="ind" :text='it.title' v-for="(it, ind) in item"
-                                   @click="selectRule(it)"></van-grid-item>
-                </van-grid>
-            </van-tab>
-        </van-tabs>
-        <div class="block" v-if="submitting">
-            <van-loading :style="{'text-align': 'center','padding-top': '35px'}" size="35px"></van-loading>
-        </div>
-        <div class="submit" v-else><van-button round plain hairline type="info" @click="submitAll">提交评分</van-button></div>
-
+        <van-skeleton title :row="6" :loading="loading" class="skeleton">
+            <van-tabs v-model="tabs.active">
+                <van-tab :title="key" :key="key" v-for="(item,key) in tabs.data">
+                    <van-grid>
+                        <van-grid-item :icon="it.icon ? it.icon : 'question-o'" :key="ind" :text='it.title' v-for="(it, ind) in item"
+                                       @click="selectRule(it)"></van-grid-item>
+                    </van-grid>
+                </van-tab>
+            </van-tabs>
+            <div class="block" v-if="submitting">
+                <van-loading :style="{'text-align': 'center','padding-top': '35px'}" size="35px"></van-loading>
+            </div>
+            <div class="submit" v-else><van-button round plain hairline type="info" @click="submitAll">提交评分</van-button></div>
+        </van-skeleton>
         <div class="rater" v-show="selectedRule.weight">
             <van-action-sheet v-model="showPicker" close-on-click-action @cancel="onCancel"
                               :description="selectedRule.desc">
@@ -36,7 +36,7 @@
     import config from '@/config'
     import { getStore } from '@/utils/storage'
 
-    import { Tab, Tabs, NavBar, Toast, Grid, GridItem, Picker, ActionSheet, CellGroup, Button, Notify, Loading } from 'vant'
+    import { Tab, Tabs, NavBar, Toast, Grid, GridItem, Picker, ActionSheet, CellGroup, Button, Notify, Loading, Skeleton } from 'vant'
 
     export default {
         name: "Score",
@@ -51,7 +51,8 @@
             [Grid.name]: Grid,
             [GridItem.name]: GridItem,
             [Tab.name]: Tab,
-            [Tabs.name]: Tabs
+            [Tabs.name]: Tabs,
+            [Skeleton.name]: Skeleton
         },
         data () {
             return {
@@ -67,6 +68,7 @@
                     desc: ''
                 },
                 submitting: false,
+                loading: true,
                 showPicker: false,
                 tabs: {
                     data: [],
@@ -83,8 +85,10 @@
         },
         methods: {
             getRule () {
+                const _this = this
                 getDeptRule(this.curObject.id).then((res) => {
                     this.tabs.data = res.data
+                    setTimeout(function(){_this.loading = false}, 200)
                 })
             },
             onClickLeft () {
@@ -104,7 +108,7 @@
                 Toast(`当前值：${value}`)
                 this.showPicker = false
                 this.submitting = true
-
+                this.selectedRule.icon = 'success'
                 const campaignID = getStore(config.campaignRef)
                 const data = {campaignID: campaignID, ruleID: _this.selectedRule.rule_id, score: value}
                 postScore(_this.curObject.id, data).then((res) => {
@@ -187,5 +191,9 @@
         height: 120px;
         border-radius: 3px;
         background-color: #eceaea5c;
+    }
+    .skeleton {
+        margin-top: 20px;
+        margin-bottom: 10px;
     }
 </style>
