@@ -30,11 +30,11 @@ class Login
                 return $next($request);
             }
 
-            // if ($userInfo = Token::getCurrentUserInfo()) {
-            //     $request->user = $userInfo;
-            // }
-            $userInfo = User::find(1)->toArray();
-            $request->user = $userInfo;
+            if ($userInfo = Token::getCurrentUserInfo()) {
+                $request->user = (array)$userInfo;
+            }
+            // $userInfo = User::find(1)->toArray();
+            // $request->user = $userInfo;
             return $next($request);
         } catch (TokenException $exception) {
             throw new ForbiddenException(['msg' => '请先登录']);

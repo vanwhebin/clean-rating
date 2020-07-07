@@ -23,7 +23,7 @@ class Token
     public static function getToken($user)
     {
         $accessToken = self::createAccessToken($user);
-        $refreshToken = self::createRefreshToken($user);
+        // $refreshToken = self::createRefreshToken($user);
         return [
             'access_token' => $accessToken,
             // 'refresh_token' => $refreshToken
