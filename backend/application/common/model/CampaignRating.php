@@ -78,7 +78,6 @@ class CampaignRating extends BaseModel
      * @return CampaignRating|array|PDOStatement|string|Model
      * @throws DataNotFoundException
      * @throws DbException
-     * @throws InvalidParamException
      * @throws ModelNotFoundException
      */
     public static function updateStatus($campaignID, $deptID, $userID)
@@ -92,7 +91,8 @@ class CampaignRating extends BaseModel
         });
 
         if (!$model->isEmpty()) {
-            throw new InvalidParamException(['msg' => '评分已保存，不可重复提交']);
+            return true;
+            // throw new InvalidParamException(['msg' => '评分已保存，不可重复提交']);
         } else {
             $model = self::create([
                 'dept_id' => $deptID,

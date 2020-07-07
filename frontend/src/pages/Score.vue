@@ -142,9 +142,11 @@
                 // 提交信息 不允许修改
                 if (this.checkRating()) {
                     const _this = this
+                    this.submitting = true
                     const campaignID = getStore(config.campaignRef)
                     const data = {campaignID: campaignID}
                     putSubmit(_this.curObject.id, data).then((r) => {
+                        setTimeout(function() {_this.submitting = false}, 500)
                         if (!r.code) {
                             Notify({ type: 'success', message: '提交成功', duration: 800, onClose: () => {
                                     _this.$router.push({name: 'list'})
