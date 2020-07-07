@@ -2,5 +2,5 @@ export default {
     campaignRef: 'campaignID',
     campaignTitle: 'campaignTitle',
     token: 'token',
-    version: '/v1'
+    version: 'api/v1'
 }
