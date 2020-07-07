@@ -2,7 +2,7 @@
     <div>
         <van-nav-bar :title="campaign.title" left-text="返回" left-arrow @click-left="onClickLeft"></van-nav-bar>
 
-        <van-list @load="onLoad" :style="{'margin-top': '15px'}">
+        <van-list :style="{'margin-top': '15px'}">
             <van-cell v-for="(item, k) in list" :key="k" :title="k" :center="center" :value="item"></van-cell>
         </van-list>
         <div class="submit" v-show="checkAllBtn"><van-button round plain hairline type="info" @click="checkAll">查看全部</van-button></div>
