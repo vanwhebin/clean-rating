@@ -8,8 +8,8 @@ class Rule extends BaseModel
 {
     public $category = [
         '1' => '办公区域',
-        '2' => '公共区域',
-        '3' => '样品区域',
+        '2' => '样品区域',
+        '3' => '公共区域',
     ];
 
 
