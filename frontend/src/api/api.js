@@ -1,6 +1,6 @@
 import api from './index'
 import config from '../config/index'
-const version = config.version
+const version = process.env.NODE_ENV  === 'production' ? config.version : 'v1'
 
 export const getLatestCampaign = () => {
   return api.get(`${version}/campaign/latest`)
